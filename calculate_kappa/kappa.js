@@ -176,6 +176,7 @@ function calcKappa(matches) {
     agreement /= total;
     var p_e = calculatePE(classes, [personAclasses, personBclasses], total);
     console.info("\n\ntotal: " + total + "\tagreement: " + agreement + "\nkappa: " + (agreement - p_e) / (1 - p_e) + "\tfor " + total + " issues");
+    console.info("<=> : " + personAclasses[0] + "\t<dupl.> : " + personAclasses[1] + "\t=> : " + personAclasses[2] + "\t<= :" + personAclasses[3] + "\t");
 }
 /**
  * This function calculates the p_e value of the kappa

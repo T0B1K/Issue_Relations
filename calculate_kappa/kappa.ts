@@ -146,6 +146,7 @@ function calcKappa(matches: number[][]): void {
     agreement /= total;
     let p_e: number = calculatePE(classes, [personAclasses, personBclasses], total);
     console.info(`\n\ntotal: ${total}\tagreement: ${agreement}\nkappa: ${(agreement - p_e) / (1 - p_e)}\tfor ${total} issues`)
+    console.info(`<=> : ${personAclasses[0]}\t<dupl.> : ${personAclasses[1]}\t=> : ${personAclasses[2]}\t<= :${personAclasses[3]}\t`)
 }
 
 /**
