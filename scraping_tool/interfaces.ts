@@ -2,12 +2,15 @@ const URL = require('url');
 import { promises as fs } from 'fs';
 
 export enum Relation {
-    right,
-    left,
-    both,
+    right,  //causes
+    left,   //is caused by
+    both,   //undefined relation
     duplicate
 }
 
+/**
+ * This interface is used for documenting the relations between two issues
+ */
 export interface IssueRelation {
     urlIssueA: string;
     urlIssueB: string;
@@ -24,7 +27,10 @@ export interface Comment {
     body: string;
 }
 
-export interface DataNodeObject {
+/**
+ * Through this interface issues are created
+ */
+export interface IssueInterface {
     id: string;
     issueID: number;
     repository: string;
@@ -38,7 +44,7 @@ export interface DataNodeObject {
 /**
  * This class is the class for the nodes 
  */
-export class DataNode implements DataNodeObject {
+export class DataNode implements IssueInterface {
     id: string;
     issueID: number;
     repository: string;
@@ -48,9 +54,13 @@ export class DataNode implements DataNodeObject {
     comments: Comment[];
     url: string;
 
+    /**
+     * This is the constructor of the Data Node class
+     * and Creates a Data Node given a url string
+     * @param url this is the URL of the issue
+     */
     constructor(url: string) {
         this.url = url;
-
         let parsedURL: any = URL.parse(url, true);
         let pathname: string[] = parsedURL.pathname.split("/");
         this.user = pathname[1];
