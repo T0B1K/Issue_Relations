@@ -1,0 +1,7 @@
+
+y_train_sum : |[359 367 372 359 351]|=1808	y_test_sum : |[ 93  85  80  93 101]|=452	y_dev_sum : |[96 96 96 96 96]|=480
+
+unrelated, duplicate, both, left, right
+
+classes
+[897 415 766  50 402]

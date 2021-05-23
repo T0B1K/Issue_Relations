@@ -1,0 +1,9 @@
+unrelated, duplicate, both, left, right
+precission
+[0.203, 0.2917, 0.3165, 0.2683, 0.2034]
+recall
+[0.6832, 0.0435, 0.2733, 0.0683, 0.0745]
+f1_scores
+[0.3129, 0.0757, 0.2933, 0.1089, 0.1091]
+normalized f1:
+0.17998

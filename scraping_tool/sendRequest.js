@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.sendRequest = exports.isBlank = void 0;
+exports.sendLongCommentsRequest = exports.sendRequest = exports.isBlank = void 0;
 var axios = require('axios');
 /**
  * Checks if the string is undefined, blank or null
@@ -88,3 +88,42 @@ function sendRequest(node, comments) {
     });
 }
 exports.sendRequest = sendRequest;
+/**
+ * This function is used for sending long requests (requests with 90 comments)
+ * It automatically searches for new comments and scrapes them
+ *
+ * @param node The node JSON from which the data is being provided
+ * @param comments Whether the comments should be quarried or the issue itself
+ */
+function sendLongCommentsRequest(node) {
+    return __awaiter(this, void 0, void 0, function () {
+        var address, page, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    address = createAddress(node.user, node.repository, "" + node.issueID, true), page = getGitHubPage(node.comments.length);
+                    address = address + "?per_page=90&page=" + page;
+                    console.log(address + "\n nr of comments: " + node.comments.length + "\tpage: " + page);
+                    return [4 /*yield*/, axios.get(address)];
+                case 1:
+                    response = _a.sent();
+                    return [2 /*return*/, response.data];
+            }
+        });
+    });
+}
+exports.sendLongCommentsRequest = sendLongCommentsRequest;
+/**
+ * This function returns the next page to be crawled by the github api request
+ *
+ * @param numberOfComments The number of comments in the current request
+ * @returns the next page to crawl
+ */
+function getGitHubPage(numberOfComments) {
+    if (numberOfComments <= 0)
+        return 0;
+    else if (numberOfComments == 30)
+        return 0;
+    else
+        return 1 + (numberOfComments / 90);
+}

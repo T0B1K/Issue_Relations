@@ -34,9 +34,40 @@ function createAddress(user: string, repository: string, issueID: string, commen
  * @param node The node JSON from which the data is being provided
  * @param comments Whether the comments should be quarried or the issue itself
  */
-export async function sendRequest(node, comments:boolean) {
+export async function sendRequest(node, comments: boolean) {
     //console.log(`send request ${node.user}, ${node.repository}, ${node.issueID}, ${comments}`)
     let address: string = createAddress(node.user, node.repository, `${node.issueID}`, comments);
     const response = await axios.get(address);
     return response.data;
+}
+
+/**
+ * This function is used for sending long requests (requests with 90 comments)
+ * It automatically searches for new comments and scrapes them
+ * 
+ * @param node The node JSON from which the data is being provided
+ * @param comments Whether the comments should be quarried or the issue itself
+ */
+export async function sendLongCommentsRequest(node) {
+    //console.log(`send request ${node.user}, ${node.repository}, ${node.issueID}, ${comments}`)
+    let address: string = createAddress(node.user, node.repository, `${node.issueID}`, true),
+        page: number = getGitHubPage(node.comments.length);
+    address = `${address}?per_page=90&page=${page}`
+    console.log(`${address}\n nr of comments: ${node.comments.length}\tpage: ${page}`)
+    const response = await axios.get(address);
+    return response.data;
+}
+/**
+ * This function returns the next page to be crawled by the github api request 
+ * 
+ * @param numberOfComments The number of comments in the current request
+ * @returns the next page to crawl
+ */
+function getGitHubPage(numberOfComments: number): number {
+    if (numberOfComments <= 0)
+        return 0;
+    else if (numberOfComments == 30)
+        return 0
+    else
+        return 1 + (numberOfComments / 90);
 }

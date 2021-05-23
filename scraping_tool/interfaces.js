@@ -50,6 +50,11 @@ var Relation;
  * This class is the class for the nodes
  */
 var DataNode = /** @class */ (function () {
+    /**
+     * This is the constructor of the Data Node class
+     * and Creates a Data Node given a url string
+     * @param url this is the URL of the issue
+     */
     function DataNode(url) {
         this.url = url;
         var parsedURL = URL.parse(url, true);

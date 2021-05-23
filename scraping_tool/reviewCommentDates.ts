@@ -1,4 +1,4 @@
-import { IssueRelation, DataNodeObject, Comment, getDataFromFile, writeToFile } from "./interfaces";
+import { IssueRelation, IssueInterface, Comment, getDataFromFile, writeToFile } from "./interfaces";
 
 const SCRAPED_ISSUE_FILE: string = "../scraped_files/nodes.json",
     RELATION_FILE = "../scraped_files/relations.json",
@@ -12,7 +12,7 @@ const SCRAPED_ISSUE_FILE: string = "../scraped_files/nodes.json",
  * @param bufferedRelationalData all the relations
  */
 function searchForDatesLogic(bufferedNodeData: Buffer, bufferedRelationalData: Buffer) {
-    let nodeData: DataNodeObject[] = JSON.parse(bufferedNodeData.toString()),
+    let nodeData: IssueInterface[] = JSON.parse(bufferedNodeData.toString()),
         relationalData: IssueRelation[] = JSON.parse(bufferedRelationalData.toString());;
 
     searchThroughRelations(nodeData, relationalData)
@@ -27,11 +27,11 @@ function searchForDatesLogic(bufferedNodeData: Buffer, bufferedRelationalData: B
  * @param nodeData The issues
  * @param relationalData The relations two issues are standing in
  */
-function searchThroughRelations(nodeData: DataNodeObject[], relationalData: IssueRelation[]) {
+function searchThroughRelations(nodeData: IssueInterface[], relationalData: IssueRelation[]) {
     let nullCounter: number = 0;
     for (let relation of relationalData) {
         if (relation == null) continue;
-        let issueA: DataNodeObject = undefined, issueB: DataNodeObject = undefined;
+        let issueA: IssueInterface = undefined, issueB: IssueInterface = undefined;
 
         for (let issue of nodeData) {                                   //search for both issues involved in the relation in noteData
             if (issue == null) continue;
@@ -57,7 +57,7 @@ function searchThroughRelations(nodeData: DataNodeObject[], relationalData: Issu
  * @param issueB The second issue
  * @returns The date of the mention
  */
-function searchMentionsInComments(issueA: DataNodeObject, issueB: DataNodeObject): Date {
+function searchMentionsInComments(issueA: IssueInterface, issueB: IssueInterface): Date {
     let commentsIssueA: Comment[] = issueA.comments,
         commentsIssueB: Comment[] = issueB.comments,
         issueAID: string = `#${issueA.issueID}`,
@@ -83,11 +83,14 @@ function searchThroughComments(comments: Comment[], searchTerm: string, issueId:
     if (comments == undefined) return returnDate
 
     comments.forEach((comment: Comment, idx) => {
-        let searchTermPattern = new RegExp(searchTerm, "i");
+        let searchTermPattern = new RegExp(searchTerm);
         let urlMentioned: number = comment.body.search(searchTermPattern),
-            idMentioned: number = comment.body.search(issueId);
-        if (urlMentioned >= 0 || idMentioned >= 0)
+            idMentioned: number = comment.body.search(issueId),
+            patt = new RegExp(searchTerm);
+        let tmp:boolean = patt.test(comment.body)
+        if (tmp || urlMentioned > 0 || idMentioned >= 0)
             returnDate = new Date(comments[idx].createdAt);
+            
     });
     return returnDate;
 }

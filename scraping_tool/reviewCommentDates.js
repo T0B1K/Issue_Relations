@@ -81,9 +81,10 @@ function searchThroughComments(comments, searchTerm, issueId) {
     if (comments == undefined)
         return returnDate;
     comments.forEach(function (comment, idx) {
-        var searchTermPattern = new RegExp(searchTerm, "i");
-        var urlMentioned = comment.body.search(searchTermPattern), idMentioned = comment.body.search(issueId);
-        if (urlMentioned >= 0 || idMentioned >= 0)
+        var searchTermPattern = new RegExp(searchTerm);
+        var urlMentioned = comment.body.search(searchTermPattern), idMentioned = comment.body.search(issueId), patt = new RegExp(searchTerm);
+        var tmp = patt.test(comment.body);
+        if (tmp || urlMentioned > 0 || idMentioned >= 0)
             returnDate = new Date(comments[idx].createdAt);
     });
     return returnDate;

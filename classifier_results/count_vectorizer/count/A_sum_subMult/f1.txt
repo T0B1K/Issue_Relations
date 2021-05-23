@@ -1,0 +1,20 @@
+[test loss, test accuracy]: [45.70317077636719, 0.3541666567325592]
+f1
+ >	unrelated : 0.6027397260273972	duplicate : 0.2608695652173913	both : 0.2171945701357466
+	left : 0.3333333333333333	right : 0.32335329341317365
+precission
+ >	unrelated : 0.5365853658536586	duplicate : 0.3230769230769231	both : 0.192
+	left : 0.3333333333333333	right : 0.38028169014084506
+recall
+ >	unrelated : 0.6875	duplicate : 0.21875	both : 0.25
+	left : 0.3333333333333333	right : 0.28125
+
+unrelated, duplicate, both, left, right
+precission
+[0.5366, 0.3231, 0.192, 0.3333, 0.3803]
+recall
+[0.6875, 0.2188, 0.25, 0.3333, 0.2812]
+f1_scores
+[0.6027, 0.2609, 0.2172, 0.3333, 0.3234]
+normalized f1:
+0.3475

@@ -1,7 +1,7 @@
-import { DataNode, IssueRelation, Relation, DataNodeObject, Comment, writeToFile, getDataFromFile } from "./interfaces";
+import { DataNode, IssueRelation, Relation, IssueInterface, Comment, writeToFile, getDataFromFile } from "./interfaces";
 import { sendRequest, isBlank } from "./sendRequest";
 
-var nodes: DataNodeObject[] = [];
+var nodes: IssueInterface[] = [];
 var issueRelations: IssueRelation[] = [];
 const NUMBER_OF_REQUESTS: number = 10;
 
@@ -19,7 +19,7 @@ function createNodesIfNotExist(data: string) {
   let tmp: string = data.replace(/\s*(\<\=\>|\=\>|\<\=|\<dupl\.\>|\n)\s*/g, "#");
   let urlSet: Set<string> = new Set(tmp.split("#"));
   let urls: string[] = Array.from(urlSet);
-  let possibleNodes: DataNodeObject[] = urls.map(url => new DataNode(url)); //create Datanodes from url
+  let possibleNodes: IssueInterface[] = urls.map(url => new DataNode(url)); //create Datanodes from url
 
   possibleNodes.forEach(pn => {
     let found: Boolean = false;
@@ -45,7 +45,7 @@ function createNodesIfNotExist(data: string) {
 function getUnscrapedNodes(): number[] {
   let blankNodeIndexes: number[] = [];
   for (let i = 0; i < nodes.length; i++) {
-    let dn: DataNodeObject = nodes[i]
+    let dn: IssueInterface = nodes[i]
     if (isBlank(dn.body) && isBlank(dn.title))
       blankNodeIndexes.push(i)
   }
@@ -148,7 +148,7 @@ loadDataCreateNodes();
  * @param nodeObject The node on which to append the comments
  * @param githubApiJson The Github api response
  */
-function addComments(nodeObject: DataNodeObject, githubApiJson): void {
+function addComments(nodeObject: IssueInterface, githubApiJson): void {
   let comments = [];
   githubApiJson.forEach(gitHubApiCommentJSON => {
     let comment: Comment = {
