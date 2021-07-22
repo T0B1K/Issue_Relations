@@ -2,6 +2,7 @@
 exports.__esModule = true;
 var interfaces_1 = require("./interfaces");
 var SCRAPED_ISSUE_FILE = "../scraped_files/nodes.json", RELATION_FILE = "../scraped_files/relations.json", FINISHED_ISSUE_RELATION_FILE = "../scraped_files/finishedRelations.json";
+var issuesInBody = 0, foundInIssueAComments = 0, foundInIssueBComments = 0;
 /**
  * This function is used for searching through all the relations and matching the dates to the date of the first mention between
  * the two issues
@@ -11,7 +12,6 @@ var SCRAPED_ISSUE_FILE = "../scraped_files/nodes.json", RELATION_FILE = "../scra
  */
 function searchForDatesLogic(bufferedNodeData, bufferedRelationalData) {
     var nodeData = JSON.parse(bufferedNodeData.toString()), relationalData = JSON.parse(bufferedRelationalData.toString());
-    ;
     searchThroughRelations(nodeData, relationalData);
     console.info("loaded " + nodeData.length + " nodes and " + relationalData.length + " relations");
     var dataString = JSON.stringify(relationalData);
@@ -62,32 +62,51 @@ function searchThroughRelations(nodeData, relationalData) {
  * @returns The date of the mention
  */
 function searchMentionsInComments(issueA, issueB) {
-    var commentsIssueA = issueA.comments, commentsIssueB = issueB.comments, issueAID = "#" + issueA.issueID, issueBID = "#" + issueB.issueID, date = undefined;
-    date = searchThroughComments(commentsIssueA, issueB.url, issueBID);
-    if (date == undefined)
-        date = searchThroughComments(commentsIssueB, issueA.url, issueAID);
-    return date;
+    var commentsIssueA = issueA.comments, commentsIssueB = issueB.comments, issueAID = "#" + issueA.issueID, issueBID = "#" + issueB.issueID, issueAbody = issueA.body, issueBbody = issueB.body;
+    var idPatternA = new RegExp(issueAID, "i"), idPatternB = new RegExp(issueBID, "i");
+    if (findUrl(issueBbody, issueA) || idPatternA.test(issueBbody) || findUrl(issueAbody, issueB) || idPatternB.test(issueAbody)) {
+        issuesInBody++;
+        return new Date(1900);
+    }
+    if (commentsIssueB != undefined) {
+        for (var _i = 0, commentsIssueB_1 = commentsIssueB; _i < commentsIssueB_1.length; _i++) {
+            var comment = commentsIssueB_1[_i];
+            var body = comment.body;
+            if (findUrl(body, issueA) || idPatternA.test(body)) {
+                foundInIssueAComments++;
+                return new Date(comment.createdAt);
+            }
+        }
+    }
+    if (commentsIssueA != undefined) {
+        for (var _a = 0, commentsIssueA_1 = commentsIssueA; _a < commentsIssueA_1.length; _a++) {
+            var comment = commentsIssueA_1[_a];
+            var body = comment.body;
+            if (findUrl(body, issueB) || idPatternB.test(body)) {
+                foundInIssueAComments++;
+                return new Date(comment.createdAt);
+            }
+        }
+    }
+    return null;
 }
 /**
- * This function searches through comments and returns the date, on which the one of the two search terms has been found.
- *
- * @param comments The comments of one issue
- * @param searchTerm The url of the other issue
- * @param issueId The issue id of the other issue
- * @returns the date on which issue was mentioned in the comments
+ * This function searches for a issue mention in a given string and returns whether or not the issue was mentioned in this string.
+ * @param string the string to search the url mention in
+ * @param issue the issue from which the url and id have to be searched
+ * @returns whether or not the search term was found
  */
-function searchThroughComments(comments, searchTerm, issueId) {
-    var returnDate = undefined;
-    if (comments == undefined)
-        return returnDate;
-    comments.forEach(function (comment, idx) {
-        var searchTermPattern = new RegExp(searchTerm);
-        var urlMentioned = comment.body.search(searchTermPattern), idMentioned = comment.body.search(issueId), patt = new RegExp(searchTerm);
-        var tmp = patt.test(comment.body);
-        if (tmp || urlMentioned > 0 || idMentioned >= 0)
-            returnDate = new Date(comments[idx].createdAt);
-    });
-    return returnDate;
+function findUrl(string, issue) {
+    var urls = getAllUrls(string), issueID = "" + issue.issueID, searchURL = issue.url;
+    if (urls === null)
+        return false;
+    var issueIdPattern = new RegExp(issueID, "i");
+    for (var _i = 0, urls_1 = urls; _i < urls_1.length; _i++) {
+        var url = urls_1[_i];
+        if (url === searchURL || issueIdPattern.test(url))
+            return true;
+    }
+    return false;
 }
 /**
  * This function is used for searching for the date and adding it to the relation file,
@@ -95,5 +114,15 @@ function searchThroughComments(comments, searchTerm, issueId) {
  */
 function reviewComments() {
     Promise.all([interfaces_1.getDataFromFile(SCRAPED_ISSUE_FILE), interfaces_1.getDataFromFile(RELATION_FILE)]).then(function (value) { return searchForDatesLogic(value[0], value[1]); });
+}
+/**
+ * This method returns a list of all the URLs mentioned in the string.
+ * @param str the string from which all the URls have to be extracted
+ * @returns a list of valid URL strings from a given string
+ */
+function getAllUrls(str) {
+    //See https://www.w3resource.com/javascript-exercises/javascript-regexp-exercise-9.php
+    var urlPattern = /(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?/g;
+    return str.match(urlPattern);
 }
 reviewComments();
