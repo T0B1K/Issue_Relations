@@ -22,11 +22,16 @@ First we had to extract issue relations by manually going through [repositories]
 Secondly a participant read over the issues and added the relation of the issues if (there was one) into a text file using the URL of both issues and their relation "symbol" (=>, <=>, ...).
 Unrelated issues were not collected in this step, because they were generated later on.
 After one participant finished the relations [data participant A](./issue_relations/data_participant_A.txt), a second participant filled out the blanks [data Participant B](./issue_relations/data_participant_B.txt), which were handed to him instead of the relation between the URLs.\
-The inter rater agreement measured using the kohens kappa between both annotators was **[TODO]** for the first **[TODO]** issues.
+The inter rater agreement measured using the kohens kappa between both annotators was 0.70487 for the first 1457 issues, which is a substential agreement according to Landis and Koch.
 
 ### Scraper
 The issue data (head, body, url) as well as the comments (body, date) were scraped from the repositories using the [scraping tool](./scraping_tool/).
-In addition to that, the date of the relation was also collected to enable a matching of which comments were earlier and which later.
+In addition to that, the date of the relation was also collected to enable a matching of which comments were earlier and which later.\
+[issue scraper](./scraping_tool/issueScraper/app.ts) is used to collect the issues.\
+[comment scraper](./scraping_tool/commentScraper/commentScraper.ts) is used to collect the comments.\
+[comment matcher](./scraping_tool/commentDateMatcher/reviewCommentDates.ts) appends the mention dates onto the relations.\
+
+All those tools require node.js and can be run using the command *node [fiename]*.
 
 ### Creating Issue Relations
 Both, the issues and their relation were then transformed into tuples *(IssueA, issueB, relation)* (the relation is a vector of the class and the issues themselves consist out of a concatenation of the issue title, body and the comments leading up to the date of the mention).\
@@ -52,25 +57,35 @@ For the classifier we created a siamese network, which takes in two inputs and c
 In order to evaluate the performance and what model works, we tested and evaluated several models.\
 Using the Keras tuner to retrieve deep neuronal networks out of the models, did not lead to a improvement.
 
-## Microservice **[todo]**
+## Microservice
 The microservice consists out of a [vectorsation service](./microservice/vectoriser/) and a [classification service](./microservice/classifier/).\
 Both communicate over the following REST requests in a custom bridge network:\
-http://localhost:5000/vectorise_issues
+There are 3 entrypoints for requests, the vectorise_issues and the vectorise_and_classify_issues entrypoint, the  for the Vectorisation service and the classify_documents one for the classification service.
+For both services only the issue texts are required.\
+The classification service on the other hand requires the issueTexts as well as the vectorisedIssues.
+
+>http://localhost:5000/vectorise_issues
 {"issueTexts": ["huehu", "aber ich bin ein doc", "anderes Document"]}
 
-http://localhost:5000/vectorise_and_classify_issues
+>http://localhost:5000/vectorise_and_classify_issues
 {"issueTexts": ["huehu", "aber ich bin ein doc", "anderes Document"]}
 
-http://localhost:5001/classify_documents
+>http://localhost:5001/classify_documents
 
 
-The vectoriser uses the public available universal sentence encoder to create document embeddings, because it achieved the best results in combined with our _UniCosConcat_ classifier.
+The vectoriser uses the public available universal sentence encoder to create document embeddings, because it achieved the best results in combined with our _UniCosConcat_ classifier.\
+And the classification service uses the _UniCosConcat_ model, and applies it onto all the relations needed to obtain the issue graph
 
 ## Instructions
+### Instructions for the Microservice
+The microservice can be started using docker-compose.
+It requires docker, as well as compose.\
+With the folder, the microservice can be started using the command *docker-compose up*.
 
-### instructions for the microservice
-
-
+### Instructions for the Jupiter Notebooks files
+The Jupiter Notebooks files can be started by importing them into Google Collab.
+Google Collab offers most the packages runs the code in the browser.\
+*https://colab.research.google.com/*\
 
 ## Directory Structure
 
