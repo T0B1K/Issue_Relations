@@ -37,6 +37,7 @@ async function getDataFromFile(firstFile: Boolean): Promise<Buffer> {
  * @param replacePatternA 
  */
 function createRelations(document: string, replacePatternA: boolean) {
+    if(document === "") throw new Error("No documentname provided")
     let rows: string[] = document.split(/\s*\n/);
     rows.forEach(row => createRelationsFromString(row, replacePatternA));
 }
@@ -78,6 +79,7 @@ function createRelationsFromString(row: string, replacePatternA: boolean) {
  * @returns the relation number matching the relation
  */
 function checkForRelation(str: string): number {
+    if(str === "") throw new Error("No relation-string provided")
     let relation = -1;
     if (str === "")
         return relation
@@ -157,6 +159,7 @@ function calcKappa(matches: number[][]): void {
  * @returns p_e
  */
 function calculatePE(classes: number, personClasses: number[][], total: number): number {
+    if(classes < 1) throw new Error("No class provided - There has to be at least one class")
     let p_e: number = 0
     for (let c = 0; c < classes; c++) {
         p_e = (personClasses[0][c] / total) * (personClasses[1][c] / total);

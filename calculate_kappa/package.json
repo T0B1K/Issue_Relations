@@ -1,0 +1,15 @@
+{
+  "name": "calculate_kappa",
+  "version": "1.0.0",
+  "description": "This calculates t\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[Dtool \u001b[C\u001b[C\u001b[C\u001b[C\u001b[D\u001b[D\u001b[D\u001b[Dcalculates the kappa value between two participants",
+  "main": "kappa.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TOKA",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/webgl2": "^0.0.6",
+    "global": "^4.4.0"
+  }
+}

@@ -1,0 +1,239 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>calculate_kappa</title>
+	<meta name="description" content="Documentation for calculate_kappa">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">calculate_kappa</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>calculate_kappa</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#issue-relations" id="issue-relations" style="color: inherit; text-decoration: none;">
+					<h1>Issue Relations</h1>
+				</a>
+				<a href="#introduction" id="introduction" style="color: inherit; text-decoration: none;">
+					<h2>Introduction</h2>
+				</a>
+				<p>When developing microservice in large, a bug/issue occurring in one component might affect another component (a so called cross-component issue).
+				This might not be a problem for small software architectures, but when developing software in large, this poses a serious threat due to the developers not knowing every bug of every component.</p>
+				<a href="#problem-statement" id="problem-statement" style="color: inherit; text-decoration: none;">
+					<h2>Problem Statement</h2>
+				</a>
+				<p>Because of this threat, a automatic issue-relation classifier is needed, to automatically predict, which issues are dependent on other issues.</p>
+				<a href="#our-solution" id="our-solution" style="color: inherit; text-decoration: none;">
+					<h2>Our Solution</h2>
+				</a>
+				<p>First we identified five kinds of issue relations:</p>
+				<ul>
+					<li><em>issue A leads to issue B</em> (henceforth =&gt;)</li>
+					<li><em>issue B leads to issue A</em> (henceforth &lt;=)</li>
+					<li><em>issue A and B are duplicates</em> (henceforth dup.)</li>
+					<li><em>issue A and B are related but the direction is unknown</em> (henceforth &lt;=&gt;)</li>
+					<li><em>issue A and B are unrelated</em> </li>
+				</ul>
+				<p>And for those relations we provide a microservice based solution, which automatically creates a issue relation graph for the given issues.</p>
+				<a href="#how-we-addressed-the-issue" id="how-we-addressed-the-issue" style="color: inherit; text-decoration: none;">
+					<h2>How We Addressed the Issue</h2>
+				</a>
+				<a href="#annotators" id="annotators" style="color: inherit; text-decoration: none;">
+					<h3>Annotators</h3>
+				</a>
+				<p>First we had to extract issue relations by manually going through <a href="./scraped_files/allRepos.txt">repositories</a> and finding mentions between issues.
+					Secondly a participant read over the issues and added the relation of the issues if (there was one) into a text file using the URL of both issues and their relation &quot;symbol&quot; (=&gt;, &lt;=&gt;, ...).
+					Unrelated issues were not collected in this step, because they were generated later on.
+				After one participant finished the relations <a href="./issue_relations/data_participant_A.txt">data participant A</a>, a second participant filled out the blanks <a href="./issue_relations/data_participant_B.txt">data Participant B</a>, which were handed to him instead of the relation between the URLs.<br>The inter rater agreement measured using the kohens kappa between both annotators was <strong>[TODO]</strong> for the first <strong>[TODO]</strong> issues.</p>
+				<a href="#scraper" id="scraper" style="color: inherit; text-decoration: none;">
+					<h3>Scraper</h3>
+				</a>
+				<p>The issue data (head, body, url) as well as the comments (body, date) were scraped from the repositories using the <a href="./scraping_tool/">scraping tool</a>.
+				In addition to that, the date of the relation was also collected to enable a matching of which comments were earlier and which later.</p>
+				<a href="#creating-issue-relations" id="creating-issue-relations" style="color: inherit; text-decoration: none;">
+					<h3>Creating Issue Relations</h3>
+				</a>
+				<p>Both, the issues and their relation were then transformed into tuples <em>(IssueA, issueB, relation)</em> (the relation is a vector of the class and the issues themselves consist out of a concatenation of the issue title, body and the comments leading up to the date of the mention).<br>Also, the unrelated issues were generated by creating the issue graph (unconnected a graph consisting out of smaller connected &quot;sub&quot; graphs) and pairing issues from different &quot;sub&quot; graphs together.<br>Image of a connected sub-graph:
+					<img src="./relation_map/issue_map_cropped.png" alt="image text">
+				This ensures, that there is no transitive relation between the issues.</p>
+				<blockquote>
+					<p>A transitive relation can be seen in the picture above (the three green nodes at the top connected by &quot;dupl.&quot; edges).
+					lets call them A,B,C<br>now A is a duplicate of B, and B is a duplicate of C<br>Then A and C are probably also duplicates of each other, even though there is no edge between them.</p>
+				</blockquote>
+				<a href="#relation-classifier" id="relation-classifier" style="color: inherit; text-decoration: none;">
+					<h3>Relation Classifier</h3>
+				</a>
+				<p>The classifier itself consists out of two parts, a vectoriser, which encodes the document in form of a vector and the classifier itself, for which we created a siamese like neuronal network.\</p>
+				<a href="#vectoriser" id="vectoriser" style="color: inherit; text-decoration: none;">
+					<h4>Vectoriser</h4>
+				</a>
+				<p>For the vectoriser we tested several bag of words configurations like different vocabulary sizes, un- and bigrams as well as tf-idf weighting.<br>In addition to that we tested fast text, and GloVe as word-level embeddings, combined using averaging them and usif as a weighted sentence/document representation.
+				Further, we used/tested the document embeddings obtained using the universal sentence encoder.</p>
+				<a href="#classifier" id="classifier" style="color: inherit; text-decoration: none;">
+					<h4>Classifier</h4>
+				</a>
+				<p>For the classifier we created a siamese network, which takes in two inputs and creates an outputs the issue relation class.<br>In order to evaluate the performance and what model works, we tested and evaluated several models.<br>Using the Keras tuner to retrieve deep neuronal networks out of the models, did not lead to a improvement.</p>
+				<a href="#microservice-todo" id="microservice-todo" style="color: inherit; text-decoration: none;">
+					<h2>Microservice <strong>[todo]</strong></h2>
+				</a>
+				<p>The microservice consists out of a <a href="./microservice/vectoriser/">vectorsation service</a> and a <a href="./microservice/classifier/">classification service</a>.<br>Both communicate over the following REST requests in a custom bridge network:<br><a href="http://localhost:5000/vectorise_issues">http://localhost:5000/vectorise_issues</a>
+				{&quot;issueTexts&quot;: [&quot;huehu&quot;, &quot;aber ich bin ein doc&quot;, &quot;anderes Document&quot;]}</p>
+				<p><a href="http://localhost:5000/vectorise_and_classify_issues">http://localhost:5000/vectorise_and_classify_issues</a>
+				{&quot;issueTexts&quot;: [&quot;huehu&quot;, &quot;aber ich bin ein doc&quot;, &quot;anderes Document&quot;]}</p>
+				<p><a href="http://localhost:5001/classify_documents">http://localhost:5001/classify_documents</a></p>
+				<p>The vectoriser uses the public available universal sentence encoder to create document embeddings, because it achieved the best results in combined with our <em>UniCosConcat</em> classifier.</p>
+				<a href="#instructions" id="instructions" style="color: inherit; text-decoration: none;">
+					<h2>Instructions</h2>
+				</a>
+				<a href="#instructions-for-the-microservice" id="instructions-for-the-microservice" style="color: inherit; text-decoration: none;">
+					<h3>instructions for the microservice</h3>
+				</a>
+				<a href="#directory-structure" id="directory-structure" style="color: inherit; text-decoration: none;">
+					<h2>Directory Structure</h2>
+				</a>
+				<table>
+					<thead>
+						<tr>
+							<th align="left">Folder</th>
+							<th align="left">Explanation</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td align="left">ISSUE_RELATIONS</td>
+							<td align="left">This is the main folder</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./calculate_kappa">calculate_kappa</a></td>
+							<td align="left">Here lies the Kappa script to document the Kohens Kappa between the annotators</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./classifier">classifier</a></td>
+							<td align="left">This folder contains the code to generate the classifiers</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./classifier_results">classifier_results</a></td>
+							<td align="left">This folder contains the results of the classifiers</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./generate_data">generate_data</a></td>
+							<td align="left">Here lies the logic to generate issue relations from the scraped data</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./graph_plotting">graph_plotting</a></td>
+							<td align="left">This folder contains the script for plotting issue relation graphs</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./issue_relations">issue_relations</a></td>
+							<td align="left">This folder contains the data gathered by the participants</td>
+						</tr>
+						<tr>
+							<td align="left">├┬─ <a href="./microservice">microservice</a></td>
+							<td align="left">Here lies the microservice</td>
+						</tr>
+						<tr>
+							<td align="left">│└─ <a href="./microservice/classifier">classifier</a></td>
+							<td align="left">Here lies the classification service of the microservice</td>
+						</tr>
+						<tr>
+							<td align="left">│└─ <a href="./microservice/vectoriser">vectoriser</a></td>
+							<td align="left">Here lies the vectoriser service of the microservice</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./new_data_relation">new_data_relation</a></td>
+							<td align="left">This folder contains the training, and testing data as well as statistics</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./relation_map">relation_map</a></td>
+							<td align="left">This folder contains images of the issue relation map</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./scraped_files">scraped_files</a></td>
+							<td align="left">Here the issues &amp; relation gathered are lying</td>
+						</tr>
+						<tr>
+							<td align="left">├── <a href="./scraping_tool">scraping_tool</a></td>
+							<td align="left">This folder contains the tool to scrape the github issues</td>
+						</tr>
+						<tr>
+							<td align="left">└── <a href="./train_and_test_data">train_and_test_data</a></td>
+							<td align="left">This folder contains the training, validation and test data as well as statistics regarding those</td>
+						</tr>
+				</tbody></table>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

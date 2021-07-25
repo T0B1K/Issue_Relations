@@ -1,11 +1,11 @@
 "use strict";
 exports.__esModule = true;
-var interfaces_1 = require("./interfaces");
-var sendRequest_1 = require("./sendRequest");
+var interfaces_1 = require("../interfaces");
+var sendRequest_1 = require("../sendRequest");
 var nodes = [];
 var issueRelations = [];
 var NUMBER_OF_REQUESTS = 10;
-var SCRAPED_ISSUE_FILE = "../scraped_files/nodes.json", ISSUE_RELATION_FILE = "../issue_relations/data_participant_A.txt", RELATION_FILE = "../scraped_files/relations.json";
+var SCRAPED_ISSUE_FILE = "../../scraped_files/nodes.json", ISSUE_RELATION_FILE = "../../issue_relations/data_participant_A.txt", RELATION_FILE = "../../scraped_files/relations.json";
 /**
  * This function creates nodes from the data and checks whether they are already loaded
  * - if not, it appends them to the node list
@@ -13,6 +13,8 @@ var SCRAPED_ISSUE_FILE = "../scraped_files/nodes.json", ISSUE_RELATION_FILE = ".
  * @param data The data is the data given for creating the nodes
  */
 function createNodesIfNotExist(data) {
+    if (data === "")
+        throw new Error("No data was present");
     var tmp = data.replace(/\s*(\<\=\>|\=\>|\<\=|\<dupl\.\>|\n)\s*/g, "#");
     var urlSet = new Set(tmp.split("#"));
     var urls = Array.from(urlSet);
@@ -45,7 +47,11 @@ function getUnscrapedNodes() {
             blankNodeIndexes.push(i);
     }
     console.info(blankNodeIndexes);
-    return blankNodeIndexes.slice(0, NUMBER_OF_REQUESTS);
+    var slicedBlankNodeIndexes = blankNodeIndexes.slice(0, NUMBER_OF_REQUESTS);
+    if (slicedBlankNodeIndexes === null) {
+        throw new Error("slicedBlankNodeIndexes is null!");
+    }
+    return slicedBlankNodeIndexes;
 }
 /**
  * This function is used to load the data and create new nodes
@@ -55,8 +61,13 @@ function loadDataCreateNodes() {
         .then(function (values) {
         var tmp = values[1].toString(), data = values[0].toString();
         nodes = JSON.parse(tmp);
-        createNodesIfNotExist(data);
-        createRelations(data);
+        try {
+            createNodesIfNotExist(data);
+            createRelations(data);
+        }
+        catch (error) {
+            console.error(error);
+        }
     }).then(function () { return getDataForNextIssues(); })["catch"](function (error) {
         console.error("An error occurred inside the second promise");
         console.error(error);
@@ -67,13 +78,24 @@ function loadDataCreateNodes() {
  * Afterwards it appends the new data to tne SCRAPED_ISSUE_FILE
  */
 function getDataForNextIssues() {
-    var numberarray = getUnscrapedNodes();
+    var numberarray = null;
+    try {
+        numberarray = getUnscrapedNodes();
+    }
+    catch (error) {
+        console.error(error);
+    }
     var comments = numberarray.map(function (nr) { return sendRequest_1.sendRequest(nodes[nr], true); }), //crawl comments
     issueTitleAndBodies = numberarray.map(function (nr) { return sendRequest_1.sendRequest(nodes[nr], false); }); //crawl rest of data
     var p1 = Promise.all(comments), p2 = Promise.all(issueTitleAndBodies);
     Promise.all([p1, p2]).then(function (values) {
         for (var i = 0; i < values[0].length; i++) {
-            addComments(nodes[numberarray[i]], values[0][i]);
+            try {
+                addComments(nodes[numberarray[i]], values[0][i]);
+            }
+            catch (error) {
+                console.error(error);
+            }
         }
         for (var i = 0; i < values[1].length; i++) {
             nodes[numberarray[i]].title = values[1][i].title;
@@ -91,6 +113,8 @@ function getDataForNextIssues() {
  * @param data This is the data from the document
  */
 function createRelations(data) {
+    if (data === "")
+        throw new Error("No data was present");
     var rowsInFile = data.split(/\s*\n/);
     rowsInFile.forEach(function (row) {
         var tmp = row.split(/\s*(\<\=\>|\=\>|\<\=|\<dupl\>|\<dupl\.\>|\n)\s*/);
@@ -115,6 +139,8 @@ function createRelations(data) {
  * @param relationString the Relation in form of a string
  */
 function checkForRelation(relationString) {
+    if (relationString === "")
+        throw new Error("No relationString was present");
     var relation = null;
     if (relationString.match(/\<\=\>/))
         relation = interfaces_1.Relation.both; //2
@@ -135,6 +161,8 @@ loadDataCreateNodes();
  * @param githubApiJson The Github api response
  */
 function addComments(nodeObject, githubApiJson) {
+    if (nodeObject === null)
+        new Error("No nodeObject given");
     var comments = [];
     githubApiJson.forEach(function (gitHubApiCommentJSON) {
         var comment = {

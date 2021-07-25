@@ -1,8 +1,8 @@
 "use strict";
 exports.__esModule = true;
-var interfaces_1 = require("./interfaces");
-var SCRAPED_ISSUE_FILE = "../scraped_files/nodes.json", RELATION_FILE = "../scraped_files/relations.json", FINISHED_ISSUE_RELATION_FILE = "../scraped_files/finishedRelations.json";
-var issuesInBody = 0, foundInIssueAComments = 0, foundInIssueBComments = 0;
+var interfaces_1 = require("../interfaces");
+var SCRAPED_ISSUE_FILE = "../../scraped_files/nodes.json", RELATION_FILE = "../../scraped_files/relations.json", FINISHED_ISSUE_RELATION_FILE = "../../scraped_files/finishedRelations.json", INVALID_DATE = new Date(1900);
+var issuesInBody = 0, foundInIssueAComments = 0;
 /**
  * This function is used for searching through all the relations and matching the dates to the date of the first mention between
  * the two issues
@@ -12,7 +12,12 @@ var issuesInBody = 0, foundInIssueAComments = 0, foundInIssueBComments = 0;
  */
 function searchForDatesLogic(bufferedNodeData, bufferedRelationalData) {
     var nodeData = JSON.parse(bufferedNodeData.toString()), relationalData = JSON.parse(bufferedRelationalData.toString());
-    searchThroughRelations(nodeData, relationalData);
+    try {
+        searchThroughRelations(nodeData, relationalData);
+    }
+    catch (error) {
+        console.error(error);
+    }
     console.info("loaded " + nodeData.length + " nodes and " + relationalData.length + " relations");
     var dataString = JSON.stringify(relationalData);
     interfaces_1.writeToFile(dataString, FINISHED_ISSUE_RELATION_FILE);
@@ -20,10 +25,14 @@ function searchForDatesLogic(bufferedNodeData, bufferedRelationalData) {
 /**
  * This function searches the two issues for each relation and checks afterwards at what date one of the issues was mentioned in the other one
  *
- * @param nodeData The issues
+ * @param nodeData The issues themselves
  * @param relationalData The relations two issues are standing in
  */
 function searchThroughRelations(nodeData, relationalData) {
+    if (nodeData == null)
+        throw new Error("No node Data provided");
+    if (relationalData == null)
+        throw new Error("No relationalData provided");
     var nullCounter = 0;
     for (var _i = 0, relationalData_1 = relationalData; _i < relationalData_1.length; _i++) {
         var relation = relationalData_1[_i];
@@ -62,11 +71,13 @@ function searchThroughRelations(nodeData, relationalData) {
  * @returns The date of the mention
  */
 function searchMentionsInComments(issueA, issueB) {
+    if (issueA == null || issueB == null)
+        throw Error("issueA or issueB is not present");
     var commentsIssueA = issueA.comments, commentsIssueB = issueB.comments, issueAID = "#" + issueA.issueID, issueBID = "#" + issueB.issueID, issueAbody = issueA.body, issueBbody = issueB.body;
     var idPatternA = new RegExp(issueAID, "i"), idPatternB = new RegExp(issueBID, "i");
     if (findUrl(issueBbody, issueA) || idPatternA.test(issueBbody) || findUrl(issueAbody, issueB) || idPatternB.test(issueAbody)) {
         issuesInBody++;
-        return new Date(1900);
+        return INVALID_DATE;
     }
     if (commentsIssueB != undefined) {
         for (var _i = 0, commentsIssueB_1 = commentsIssueB; _i < commentsIssueB_1.length; _i++) {
@@ -97,6 +108,8 @@ function searchMentionsInComments(issueA, issueB) {
  * @returns whether or not the search term was found
  */
 function findUrl(string, issue) {
+    if (string == null)
+        return false;
     var urls = getAllUrls(string), issueID = "" + issue.issueID, searchURL = issue.url;
     if (urls === null)
         return false;
@@ -121,6 +134,8 @@ function reviewComments() {
  * @returns a list of valid URL strings from a given string
  */
 function getAllUrls(str) {
+    if (str == "")
+        return [];
     //See https://www.w3resource.com/javascript-exercises/javascript-regexp-exercise-9.php
     var urlPattern = /(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?/g;
     return str.match(urlPattern);

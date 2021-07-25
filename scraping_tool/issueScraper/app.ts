@@ -1,13 +1,13 @@
-import { DataNode, IssueRelation, Relation, IssueInterface, Comment, writeToFile, getDataFromFile } from "./interfaces";
-import { sendRequest, isBlank } from "./sendRequest";
+import { DataNode, IssueRelation, Relation, IssueInterface, Comment, writeToFile, getDataFromFile } from "../modules_and_interfaces/interfaces";
+import { sendRequest, isBlank } from "../modules_and_interfaces/sendRequest";
 
 var nodes: IssueInterface[] = [];
 var issueRelations: IssueRelation[] = [];
 const NUMBER_OF_REQUESTS: number = 10;
 
-const SCRAPED_ISSUE_FILE: string = "../scraped_files/nodes.json",
-  ISSUE_RELATION_FILE: string = "../issue_relations/data_participant_A.txt",
-  RELATION_FILE = "../scraped_files/relations.json";
+const SCRAPED_ISSUE_FILE: string = "../../scraped_files/nodes.json",
+  ISSUE_RELATION_FILE: string = "../../issue_relations/data_participant_A.txt",
+  RELATION_FILE = "../../scraped_files/relations.json";
 
 /**
  * This function creates nodes from the data and checks whether they are already loaded
@@ -16,6 +16,7 @@ const SCRAPED_ISSUE_FILE: string = "../scraped_files/nodes.json",
  * @param data The data is the data given for creating the nodes
  */
 function createNodesIfNotExist(data: string) {
+  if (data === "") throw new Error("No data was present")
   let tmp: string = data.replace(/\s*(\<\=\>|\=\>|\<\=|\<dupl\.\>|\n)\s*/g, "#");
   let urlSet: Set<string> = new Set(tmp.split("#"));
   let urls: string[] = Array.from(urlSet);
@@ -50,7 +51,11 @@ function getUnscrapedNodes(): number[] {
       blankNodeIndexes.push(i)
   }
   console.info(blankNodeIndexes)
-  return blankNodeIndexes.slice(0, NUMBER_OF_REQUESTS);
+  let slicedBlankNodeIndexes: number[] = blankNodeIndexes.slice(0, NUMBER_OF_REQUESTS);
+  if (slicedBlankNodeIndexes === null) {
+    throw new Error("slicedBlankNodeIndexes is null!");
+  }
+  return slicedBlankNodeIndexes;
 }
 
 /**
@@ -64,8 +69,13 @@ function loadDataCreateNodes(): void {
           data: string = values[0].toString();
 
         nodes = JSON.parse(tmp)
-        createNodesIfNotExist(data);
-        createRelations(data);
+        try {
+          createNodesIfNotExist(data);
+          createRelations(data);
+        } catch (error) {
+          console.error(error)
+        }
+
       }
     ).then(() => getDataForNextIssues()
     ).catch(function (error) {
@@ -79,7 +89,12 @@ function loadDataCreateNodes(): void {
  * Afterwards it appends the new data to tne SCRAPED_ISSUE_FILE
  */
 function getDataForNextIssues() {
-  let numberarray: number[] = getUnscrapedNodes()
+  let numberarray: number[] = null;
+  try {
+    numberarray = getUnscrapedNodes();
+  } catch (error) {
+    console.error(error)
+  }
   let comments = numberarray.map((nr: number) => sendRequest(nodes[nr], true)), //crawl comments
     issueTitleAndBodies = numberarray.map((nr: number) => sendRequest(nodes[nr], false));  //crawl rest of data
   let p1 = Promise.all(comments),
@@ -87,7 +102,11 @@ function getDataForNextIssues() {
 
   Promise.all([p1, p2]).then(values => {    //add comments and body/title texts to the nodes
     for (let i = 0; i < values[0].length; i++) {
-      addComments(nodes[numberarray[i]], values[0][i])
+      try {
+        addComments(nodes[numberarray[i]], values[0][i])
+      } catch (error) {
+        console.error(error)
+      }
     }
     for (let i = 0; i < values[1].length; i++) {
       nodes[numberarray[i]].title = values[1][i].title;
@@ -107,6 +126,7 @@ function getDataForNextIssues() {
  * @param data This is the data from the document
  */
 function createRelations(data: string): void {
+  if (data === "") throw new Error("No data was present")
   let rowsInFile: string[] = data.split(/\s*\n/);
   rowsInFile.forEach(row => {
     let tmp = row.split(/\s*(\<\=\>|\=\>|\<\=|\<dupl\>|\<dupl\.\>|\n)\s*/);
@@ -131,6 +151,8 @@ function createRelations(data: string): void {
  * @param relationString the Relation in form of a string
  */
 function checkForRelation(relationString: string): Relation {
+  if (relationString === "")
+    throw new Error("No relationString was present")
   let relation = null;
   if (relationString.match(/\<\=\>/)) relation = Relation.both;           //2
   else if (relationString.match(/\<dupl/)) relation = Relation.duplicate  //3
@@ -149,6 +171,7 @@ loadDataCreateNodes();
  * @param githubApiJson The Github api response
  */
 function addComments(nodeObject: IssueInterface, githubApiJson): void {
+  if (nodeObject === null) new Error("No nodeObject given")
   let comments = [];
   githubApiJson.forEach(gitHubApiCommentJSON => {
     let comment: Comment = {

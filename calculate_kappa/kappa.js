@@ -74,6 +74,8 @@ function getDataFromFile(firstFile) {
  * @param replacePatternA
  */
 function createRelations(document, replacePatternA) {
+    if (document === "")
+        throw new Error("No documentname provided");
     var rows = document.split(/\s*\n/);
     rows.forEach(function (row) { return createRelationsFromString(row, replacePatternA); });
 }
@@ -114,6 +116,8 @@ function createRelationsFromString(row, replacePatternA) {
  * @returns the relation number matching the relation
  */
 function checkForRelation(str) {
+    if (str === "")
+        throw new Error("No relation-string provided");
     var relation = -1;
     if (str === "")
         return relation;
@@ -186,6 +190,8 @@ function calcKappa(matches) {
  * @returns p_e
  */
 function calculatePE(classes, personClasses, total) {
+    if (classes < 1)
+        throw new Error("No class provided - There has to be at least one class");
     var p_e = 0;
     for (var c = 0; c < classes; c++) {
         p_e = (personClasses[0][c] / total) * (personClasses[1][c] / total);

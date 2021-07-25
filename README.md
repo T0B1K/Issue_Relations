@@ -52,7 +52,7 @@ For the classifier we created a siamese network, which takes in two inputs and c
 In order to evaluate the performance and what model works, we tested and evaluated several models.\
 Using the Keras tuner to retrieve deep neuronal networks out of the models, did not lead to a improvement.
 
-## Microservice **[Todo]**
+## Microservice **[todo]**
 The microservice consists out of a [vectorsation service](./microservice/vectoriser/) and a [classification service](./microservice/classifier/).\
 Both communicate over the following REST requests in a custom bridge network:\
 http://localhost:5000/vectorise_issues

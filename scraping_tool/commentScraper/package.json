@@ -1,0 +1,11 @@
+{
+  "name": "commentscraper",
+  "version": "1.0.0",
+  "description": "This tool collects the comments of GitHub issues",
+  "main": "commentScraper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TOKA",
+  "license": "ISC"
+}

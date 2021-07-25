@@ -1,13 +1,12 @@
-import { IssueRelation, IssueInterface, Comment, getDataFromFile, writeToFile } from "./interfaces";
+import { IssueRelation, IssueInterface, Comment, getDataFromFile, writeToFile } from "../modules_and_interfaces/interfaces";
 
-const SCRAPED_ISSUE_FILE: string = "../scraped_files/nodes.json",
-    RELATION_FILE = "../scraped_files/relations.json",
-    FINISHED_ISSUE_RELATION_FILE: string = "../scraped_files/finishedRelations.json",
+const SCRAPED_ISSUE_FILE: string = "../../scraped_files/nodes.json",
+    RELATION_FILE = "../../scraped_files/relations.json",
+    FINISHED_ISSUE_RELATION_FILE: string = "../../scraped_files/finishedRelations.json",
     INVALID_DATE:Date = new Date(1900);
 
-var issuesInBody = 0,
-    foundInIssueAComments = 0,
-    foundInIssueBComments = 0;
+var issuesInBody:number = 0,
+    foundInIssueAComments:number = 0;
 /**
  * This function is used for searching through all the relations and matching the dates to the date of the first mention between
  * the two issues
@@ -18,8 +17,11 @@ var issuesInBody = 0,
 function searchForDatesLogic(bufferedNodeData: Buffer, bufferedRelationalData: Buffer) {
     let nodeData: IssueInterface[] = JSON.parse(bufferedNodeData.toString()),
         relationalData: IssueRelation[] = JSON.parse(bufferedRelationalData.toString());
-
-    searchThroughRelations(nodeData, relationalData)
+    try {
+        searchThroughRelations(nodeData, relationalData)
+    } catch (error) {
+        console.error(error)
+    }
     console.info(`loaded ${nodeData.length} nodes and ${relationalData.length} relations`)
     let dataString = JSON.stringify(relationalData);
     writeToFile(dataString, FINISHED_ISSUE_RELATION_FILE);
@@ -28,10 +30,12 @@ function searchForDatesLogic(bufferedNodeData: Buffer, bufferedRelationalData: B
 /**
  * This function searches the two issues for each relation and checks afterwards at what date one of the issues was mentioned in the other one
  * 
- * @param nodeData The issues
+ * @param nodeData The issues themselves
  * @param relationalData The relations two issues are standing in
  */
 function searchThroughRelations(nodeData: IssueInterface[], relationalData: IssueRelation[]) {
+    if(nodeData==null) throw new Error("No node Data provided");
+    if(relationalData==null) throw new Error("No relationalData provided");
     let nullCounter: number = 0;
     for (let relation of relationalData) {
         if (relation == null) continue;
@@ -62,6 +66,7 @@ function searchThroughRelations(nodeData: IssueInterface[], relationalData: Issu
  * @returns The date of the mention
  */
 function searchMentionsInComments(issueA: IssueInterface, issueB: IssueInterface): Date {
+    if(issueA == null || issueB == null) throw Error("issueA or issueB is not present")
     let commentsIssueA: Comment[] = issueA.comments,
         commentsIssueB: Comment[] = issueB.comments,
         issueAID: string = `#${issueA.issueID}`,
@@ -103,6 +108,7 @@ function searchMentionsInComments(issueA: IssueInterface, issueB: IssueInterface
  * @returns whether or not the search term was found
  */
 function findUrl(string: string, issue: IssueInterface): boolean {
+    if(string == null) return false;
     let urls: string[] = getAllUrls(string),
         issueID: string = `${issue.issueID}`,
         searchURL: string = issue.url;
@@ -131,6 +137,7 @@ function reviewComments() {
  * @returns a list of valid URL strings from a given string
  */
 function getAllUrls(str: string): string[] {
+    if(str=="") return [];
     //See https://www.w3resource.com/javascript-exercises/javascript-regexp-exercise-9.php
     let urlPattern = /(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?/g;
     return str.match(urlPattern);
