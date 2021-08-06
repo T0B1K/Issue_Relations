@@ -74,8 +74,9 @@ The classification service on the other hand requires the issueTexts as well as 
 
 
 The vectoriser uses the public available universal sentence encoder to create document embeddings, because it achieved the best results in combined with our _UniCosConcat_ classifier.\
-And the classification service uses the _UniCosConcat_ model, and applies it onto all the relations needed to obtain the issue graph
-s
+And the classification service uses the _UniCosConcat_ model, and applies it onto all the relations needed to obtain the issue graph.\
+For the relations: 0 = unrelated; 1 = duplicated, 2 = <=>; 3 = <=; 4 = =>
+
 ## Instructions
 ### Instructions for the Microservice
 The microservice can be started using docker-compose.
@@ -105,9 +106,9 @@ Google Collab offers most the packages runs the code in the browser.\
 | ├── [generate_data](./generate_data)        | Here lies the logic to generate issue relations from the scraped data          |
 | ├── [graph_plotting](./graph_plotting)      | This folder contains the script for plotting issue relation graphs             |
 | ├── [issue_relations](./issue_relations)    | This folder contains the data gathered by the participants                     |
-| ├┬─ [microservice](./microservice)          | Here lies the microservice                                                     |
-| │└─ [classifier](./microservice/classifier) | Here lies the classification service of the microservice                       |
-| │└─ [vectoriser](./microservice/vectoriser) | Here lies the vectoriser service of the microservice                           |
+| ├┬─ [kubernetes_microservice](./kubernetes_microservice)          | Here lies the microservice                                                     |
+| │└─ [classifier](./microservice/container1) | Here lies the classification service of the microservice                       |
+| │└─ [vectoriser](./microservice/container2) | Here lies the vectoriser service of the microservice                           |
 | ├── [statistics](./statistics)              | This folder contains images of the Corpus statistics                           |
 | ├── [relation_map](./relation_map)          | This folder contains images of the issue relation map                          |
 | ├── [scraped_files](./scraped_files)        | Here the issues & relation gathered are lying                                  |
