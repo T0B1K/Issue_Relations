@@ -96,6 +96,9 @@ The Jupiter Notebooks files can be started by importing them into Google Collab.
 Google Collab offers most the packages runs the code in the browser.\
 *https://colab.research.google.com/*
 
+## Model performances
+![image tex](./f1_scores_class.PNG)
+
 ## Directory Structure
 
 | Folder                                      | Explanation                                                                    |
@@ -107,8 +110,8 @@ Google Collab offers most the packages runs the code in the browser.\
 | ├── [graph_plotting](./graph_plotting)      | This folder contains the script for plotting issue relation graphs             |
 | ├── [issue_relations](./issue_relations)    | This folder contains the data gathered by the participants                     |
 | ├┬─ [kubernetes_microservice](./kubernetes_microservice)          | Here lies the microservice                                                     |
-| │└─ [classifier](./microservice/container1) | Here lies the classification service of the microservice                       |
-| │└─ [vectoriser](./microservice/container2) | Here lies the vectoriser service of the microservice                           |
+| │└─ [classifier](./kubernetes_microservice/container1) | Here lies the classification service of the microservice                       |
+| │└─ [vectoriser](./kubernetes_microservice/container2) | Here lies the vectoriser service of the microservice                           |
 | ├── [statistics](./statistics)              | This folder contains images of the Corpus statistics                           |
 | ├── [relation_map](./relation_map)          | This folder contains images of the issue relation map                          |
 | ├── [scraped_files](./scraped_files)        | Here the issues & relation gathered are lying                                  |
