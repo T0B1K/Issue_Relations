@@ -84,7 +84,11 @@ With the folder, the microservice can be started using the command *docker-compo
 However, the [universal sentence encoder v4](https://tfhub.dev/google/universal-sentence-encoder/4) haas to be downloaded in advance and placed into the *kubernetes_microservice/container1/app* folder.
 Because in this folder the docker compose searches for a file named *universal-sentence-encoder_4.tar.gz*.\
 After the images have been built using compose, they can be used in the kubernetes cluster.\
-Simply run **kubectl append -f kompose.yaml** to push the images into the cluster
+**IMPORTANT: We use the local images build using compose for our pods therefore the compose service has to be started in advance or the images have to built manually on advance**\
+Simply run **kubectl append -f kompose.yaml** to push the images into the cluster.\
+The microservice uses the following libraries: *numpy==1.19.2*, *tensorflow==2.5.0*, *httpx==0.18.2* and is build on top of the *tiangolo/uvicorn-gunicorn-fastapi:python3.8-2021-06-09* docker images, which creates a Uvicorn ASGI server for asynchronous python web code, in addition to Gunicorn, which manages Uvicorn and FastAPI in a single container.\
+Important to note is, that the *MAX_WORKERS* environment variable can be set in the DOCERFILEs to enable multiple workers (or one per CPU).
+
 
 ### Instructions for the Jupiter Notebooks files
 The Jupiter Notebooks files can be started by importing them into Google Collab.
@@ -92,8 +96,6 @@ Google Collab offers most the packages runs the code in the browser.\
 *https://colab.research.google.com/*\
 
 ## Directory Structure
-
-**[TODO: Instructions, microservice + folder, Microservice requests]**
 
 | Folder                                      | Explanation                                                                    |
 | :------------------------------------------ | :----------------------------------------------------------------------------- |

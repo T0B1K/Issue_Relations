@@ -67,7 +67,7 @@ items:
             io.kompose.service: container1
         spec:
           containers:
-            - image: custom_kubernetes_img_test_container1
+            - image: kubernetes_microservice_container1
               imagePullPolicy: Never
               name: container1
               ports:
@@ -116,7 +116,7 @@ items:
             io.kompose.service: container2
         spec:
           containers:
-            - image: custom_kubernetes_img_test_container2
+            - image: kubernetes_microservice_container2
               imagePullPolicy: Never
               name: container2
               ports:
