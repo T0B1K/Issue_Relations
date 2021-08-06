@@ -1,6 +1,9 @@
 "use strict";
 exports.__esModule = true;
-var interfaces_1 = require("../interfaces");
+/** @internal
+ * @module
+ */
+var interfaces_1 = require("../modules_and_interfaces/interfaces");
 var SCRAPED_ISSUE_FILE = "../../scraped_files/nodes.json", RELATION_FILE = "../../scraped_files/relations.json", FINISHED_ISSUE_RELATION_FILE = "../../scraped_files/finishedRelations.json", INVALID_DATE = new Date(1900);
 var issuesInBody = 0, foundInIssueAComments = 0;
 /**
@@ -64,7 +67,7 @@ function searchThroughRelations(nodeData, relationalData) {
     console.info("for " + nullCounter + " issues no date could be found");
 }
 /**
- * This function is uesd to search through the comments of both issues to search on which date the issues have been mentioned.
+ * This function is used to search through the comments of both issues to search on which date the issues have been mentioned.
  *
  * @param issueA The first issue
  * @param issueB The second issue
@@ -73,33 +76,41 @@ function searchThroughRelations(nodeData, relationalData) {
 function searchMentionsInComments(issueA, issueB) {
     if (issueA == null || issueB == null)
         throw Error("issueA or issueB is not present");
-    var commentsIssueA = issueA.comments, commentsIssueB = issueB.comments, issueAID = "#" + issueA.issueID, issueBID = "#" + issueB.issueID, issueAbody = issueA.body, issueBbody = issueB.body;
+    var commentsIssueA = issueA.comments, commentsIssueB = issueB.comments, issueAID = "#" + issueA.issueID, issueBID = "#" + issueB.issueID, issueAbody = issueA.body, issueBbody = issueB.body, dateMentioned = null;
     var idPatternA = new RegExp(issueAID, "i"), idPatternB = new RegExp(issueBID, "i");
     if (findUrl(issueBbody, issueA) || idPatternA.test(issueBbody) || findUrl(issueAbody, issueB) || idPatternB.test(issueAbody)) {
         issuesInBody++;
         return INVALID_DATE;
     }
-    if (commentsIssueB != undefined) {
-        for (var _i = 0, commentsIssueB_1 = commentsIssueB; _i < commentsIssueB_1.length; _i++) {
-            var comment = commentsIssueB_1[_i];
-            var body = comment.body;
-            if (findUrl(body, issueA) || idPatternA.test(body)) {
-                foundInIssueAComments++;
-                return new Date(comment.createdAt);
-            }
+    dateMentioned = searchMentionInComment(issueA, commentsIssueB);
+    if (dateMentioned != null)
+        return dateMentioned;
+    dateMentioned = searchMentionInComment(issueB, commentsIssueA);
+    if (dateMentioned != null)
+        return dateMentioned;
+    return dateMentioned;
+}
+/**
+ * This function searches through the comments of the 'other issue' to retrieve mention dates of the issue.
+ *
+ * @param issue The issue, whose mention is searched
+ * @param otherIssueComments The comments of the other issue
+ * @returns The mention date or null in case it couldn't find a mention.
+ */
+function searchMentionInComment(issue, otherIssueComments) {
+    if (issue == undefined || otherIssueComments == undefined)
+        return null;
+    var returnDate = null, issueID = "#" + issue.issueID;
+    var idPattern = new RegExp(issueID, "i");
+    for (var _i = 0, otherIssueComments_1 = otherIssueComments; _i < otherIssueComments_1.length; _i++) {
+        var comment = otherIssueComments_1[_i];
+        var body = comment.body;
+        if (findUrl(body, issue) || idPattern.test(body)) {
+            foundInIssueAComments++;
+            returnDate = new Date(comment.createdAt);
         }
     }
-    if (commentsIssueA != undefined) {
-        for (var _a = 0, commentsIssueA_1 = commentsIssueA; _a < commentsIssueA_1.length; _a++) {
-            var comment = commentsIssueA_1[_a];
-            var body = comment.body;
-            if (findUrl(body, issueB) || idPatternB.test(body)) {
-                foundInIssueAComments++;
-                return new Date(comment.createdAt);
-            }
-        }
-    }
-    return null;
+    return returnDate;
 }
 /**
  * This function searches for a issue mention in a given string and returns whether or not the issue was mentioned in this string.

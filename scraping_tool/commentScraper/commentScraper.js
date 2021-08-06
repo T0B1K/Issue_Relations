@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
-var interfaces_1 = require("../interfaces");
-var sendRequest_1 = require("../sendRequest");
+var interfaces_1 = require("../modules_and_interfaces/interfaces");
+var sendRequest_1 = require("../modules_and_interfaces/sendRequest");
 var nodes = [];
 var SCRAPED_ISSUE_FILE = "../../scraped_files/nodes.json", NUMBER_OF_REQUESTS = 20, SHIFT = 25;
 /**

@@ -75,7 +75,7 @@ function displayLabelonHover(node) {
 }
 
 /**
- * This function draws the relations on the canvas
+ * This function draws the issue relations on the canvas.
  */
 function drawRelations() {
     const LABEL_NODE_MARGIN = Graph.nodeRelSize() * 1.5;

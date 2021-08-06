@@ -75,7 +75,7 @@ function getDataFromFile(firstFile) {
  */
 function createRelations(document, replacePatternA) {
     if (document === "")
-        throw new Error("No documentname provided");
+        throw new Error("No document name provided");
     var rows = document.split(/\s*\n/);
     rows.forEach(function (row) { return createRelationsFromString(row, replacePatternA); });
 }

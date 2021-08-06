@@ -1,8 +1,8 @@
 {
-  "name": "commentdatematcher",
+  "name": "reviewCommentDates",
   "version": "1.0.0",
-  "description": "This tool is used to find the mention dates between the comments",
-  "main": "reviewCommentDates.js",
+  "description": "This tool collects the comments of GitHub issues",
+  "main": "commentScraper.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

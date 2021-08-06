@@ -31,7 +31,6 @@ function createNodesIfNotExist(data: string) {
       }
     }
     if (!found) {   //The node wasn't loaded and therefore appended to the node list
-      //console.info("appended Node")
       nodes.push(pn);
     }
   })

@@ -31,7 +31,6 @@ function appendCommentsToProbablyLongNodes() {
     console.info(`probably longer: ${possibleLongComments.length}`)
     console.info(reducedNodes.map(node => node.url))
 
-
     let comments = reducedNodes.map(sendLongCommentsRequest);
     try {
         Promise.all(comments).then(cl => clearnAndOrderResponse(cl))
@@ -48,7 +47,7 @@ function appendCommentsToProbablyLongNodes() {
 function clearnAndOrderResponse(commentList): void {
     //console.log(commentList.length)
     if (commentList == null) throw new Error("comment list not provided")
-    for (let u = 0; u < commentList.length; u++) {
+    for (let u:number = 0; u < commentList.length; u++) {
         let tmp = commentList[u];
         if (tmp.length == 0 || tmp == undefined || tmp == null)
             continue;
@@ -57,7 +56,7 @@ function clearnAndOrderResponse(commentList): void {
         let comment = commentList[u];
         if (comment.length == 0)
             continue;
-        for (let i = 0; i < nodes.length; i++) {
+        for (let i:number = 0; i < nodes.length; i++) {
             if (nodes[i].url === url) {
                 console.info(`comments_len: ${nodes[i].comments.length}`)
                 try {

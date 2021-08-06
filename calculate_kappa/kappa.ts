@@ -37,7 +37,7 @@ async function getDataFromFile(firstFile: Boolean): Promise<Buffer> {
  * @param replacePatternA 
  */
 function createRelations(document: string, replacePatternA: boolean) {
-    if(document === "") throw new Error("No documentname provided")
+    if(document === "") throw new Error("No document name provided")
     let rows: string[] = document.split(/\s*\n/);
     rows.forEach(row => createRelationsFromString(row, replacePatternA));
 }
