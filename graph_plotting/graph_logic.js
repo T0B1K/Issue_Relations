@@ -134,10 +134,10 @@ function createNodeJson(index) {
  * @returns The relation object
  */
 function createRelJson(rel) {
-    if (!checkUndef(rel.relation) || !checkUndef(rel.issueA) || !checkUndef(rel.issueB) || rel.relation > 3 || rel.relation < 0)
+    if (!checkUndef(rel.relation) || !checkUndef(rel.issueA) || !checkUndef(rel.issueB) || rel.relation > 4 || rel.relation < 1)
         return undefined;
-    console.info(`relation: ${rel.relation}\t${GRAPH_RELATIONS[rel.relation]}`)
-    return { "urlIssueA": `${rel.issueA}`, "urlIssueB": `${rel.issueB}`, "relation": rel.relation }
+    let relationVal = Math.abs(rel.relation-4)      //the arrays were ordered differently in python
+    return { "urlIssueA": `${rel.issueA}`, "urlIssueB": `${rel.issueB}`, "relation": relationVal}
 }
 
 /**

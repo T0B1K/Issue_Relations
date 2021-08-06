@@ -94,7 +94,7 @@ Important to note is, that the *MAX_WORKERS* environment variable can be set in 
 ### Instructions for the Jupiter Notebooks files
 The Jupiter Notebooks files can be started by importing them into Google Collab.
 Google Collab offers most the packages runs the code in the browser.\
-*https://colab.research.google.com/*\
+*https://colab.research.google.com/*
 
 ## Directory Structure
 
