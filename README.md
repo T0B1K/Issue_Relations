@@ -75,12 +75,16 @@ The classification service on the other hand requires the issueTexts as well as 
 
 The vectoriser uses the public available universal sentence encoder to create document embeddings, because it achieved the best results in combined with our _UniCosConcat_ classifier.\
 And the classification service uses the _UniCosConcat_ model, and applies it onto all the relations needed to obtain the issue graph
-
+s
 ## Instructions
 ### Instructions for the Microservice
 The microservice can be started using docker-compose.
 It requires docker, as well as compose.\
 With the folder, the microservice can be started using the command *docker-compose up*.
+However, the [universal sentence encoder v4](https://tfhub.dev/google/universal-sentence-encoder/4) haas to be downloaded in advance and placed into the *kubernetes_microservice/container1/app* folder.
+Because in this folder the docker compose searches for a file named *universal-sentence-encoder_4.tar.gz*.\
+After the images have been built using compose, they can be used in the kubernetes cluster.\
+Simply run **kubectl append -f kompose.yaml** to push the images into the cluster
 
 ### Instructions for the Jupiter Notebooks files
 The Jupiter Notebooks files can be started by importing them into Google Collab.
@@ -89,21 +93,25 @@ Google Collab offers most the packages runs the code in the browser.\
 
 ## Directory Structure
 
+**[TODO: Instructions, microservice + folder, Microservice requests]**
 
-| Folder                                       | Explanation                                                                                       |
-| :------------------------------------------- | :------------------------------------------------------------------------------------------------ |
-| ISSUE_RELATIONS                              | This is the main folder                                                                           |
-|├── [calculate_kappa](./calculate_kappa)         | Here lies the Kappa script to document the Kohens Kappa between the annotators                    |
-|├── [classifier](./classifier)                   | This folder contains the code to generate the classifiers                                         |
-|├── [classifier_results](./classifier_results)   | This folder contains the results of the classifiers                                               |
-|├── [generate_data](./generate_data)             | Here lies the logic to generate issue relations from the scraped data                             |
-|├── [graph_plotting](./graph_plotting)           | This folder contains the script for plotting issue relation graphs                                |
-|├── [issue_relations](./issue_relations)         | This folder contains the data gathered by the participants                                        |
-|├┬─ [microservice](./microservice)               | Here lies the microservice                                                                        |
-|│└─ [classifier](./microservice/classifier)      | Here lies the classification service of the microservice                                          |
-|│└─ [vectoriser](./microservice/vectoriser)      | Here lies the vectoriser service of the microservice                                              |
-|├── [new_data_relation](./new_data_relation)     | This folder contains the training, and testing data as well as statistics                         |
-|├── [relation_map](./relation_map)               | This folder contains images of the issue relation map                                             |
-|├── [scraped_files](./scraped_files)             | Here the issues & relation gathered are lying                                                     |
-|├── [scraping_tool](./scraping_tool)             | This folder contains the tool to scrape the github issues                                         |
-|└── [train_and_test_data](./train_and_test_data) | This folder contains the training, validation and test data as well as statistics regarding those |
+| Folder                                      | Explanation                                                                    |
+| :------------------------------------------ | :----------------------------------------------------------------------------- |
+| ISSUE_RELATIONS                             | This is the main folder                                                        |
+| ├── [calculate_kappa](./calculate_kappa)    | Here lies the Kappa script to document the Kohens Kappa between the annotators |
+| ├── [classifier](./classifier)              | This folder contains the code to generate the classifiers                      |
+| ├── [generate_data](./generate_data)        | Here lies the logic to generate issue relations from the scraped data          |
+| ├── [graph_plotting](./graph_plotting)      | This folder contains the script for plotting issue relation graphs             |
+| ├── [issue_relations](./issue_relations)    | This folder contains the data gathered by the participants                     |
+| ├┬─ [microservice](./microservice)          | Here lies the microservice                                                     |
+| │└─ [classifier](./microservice/classifier) | Here lies the classification service of the microservice                       |
+| │└─ [vectoriser](./microservice/vectoriser) | Here lies the vectoriser service of the microservice                           |
+| ├── [statistics](./statistics)              | This folder contains images of the Corpus statistics                           |
+| ├── [relation_map](./relation_map)          | This folder contains images of the issue relation map                          |
+| ├── [scraped_files](./scraped_files)        | Here the issues & relation gathered are lying                                  |
+| ├┬─ [scraping_tool](./scraping_tool)        | This folder contains the tools to scrape the GitHub issues                     |
+| │└─ [commentDateMatcher](./scraping_tool/commentDateMatcher) | Here lies the tool for finding and adding the comment dates of the mentions                                          |
+| │└─ [commentDateMatcher](./scraping_tool/commentScraper) | This scraper is used to get all the comments of the Issues                                          |
+| │└─ [commentDateMatcher](./scraping_tool/issueScraper) | Here lies the issueScraper, which scrapes the issues from GitHub                                          |
+| │└─ [modules_and_interfaces](./scraping_tool/modules_and_interfaces) | Contains the modules and interfaces used for the scraping and storing of the data                                          |
+| └── [trainingsdata](./trainingsdata)        | This folder contains the training, validation and test data as well as statistics regarding those |
