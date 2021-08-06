@@ -1,0 +1,129 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f compose.yaml -o kompose.yaml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: container1
+      name: container1
+    spec:
+      ports:
+        - name: "80"
+          port: 80
+          targetPort: 80
+      selector:
+        io.kompose.service: container1
+      type: LoadBalancer
+    status:
+      loadBalancer: {}
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f compose.yaml -o kompose.yaml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: container2
+      name: container2
+    spec:
+      ports:
+        - name: "8080"
+          port: 8080
+          targetPort: 8080
+      selector:
+        io.kompose.service: container2
+      type: LoadBalancer
+    status:
+      loadBalancer: {}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f compose.yaml -o kompose.yaml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: container1
+      name: container1
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: container1
+      strategy: {}
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: kompose convert -f compose.yaml -o kompose.yaml
+            kompose.version: 1.22.0 (955b78124)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/mb: "true"
+            io.kompose.service: container1
+        spec:
+          containers:
+            - image: custom_kubernetes_img_test_container1
+              imagePullPolicy: Never
+              name: container1
+              ports:
+                - containerPort: 80
+              resources: {}
+          restartPolicy: Always
+    status: {}
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      creationTimestamp: null
+      name: mb
+    spec:
+      ingress:
+        - from:
+            - podSelector:
+                matchLabels:
+                  io.kompose.network/mb: "true"
+      podSelector:
+        matchLabels:
+          io.kompose.network/mb: "true"
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f compose.yaml -o kompose.yaml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: container2
+      name: container2
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          io.kompose.service: container2
+      strategy: {}
+      template:
+        metadata:
+          annotations:
+            kompose.cmd: kompose convert -f compose.yaml -o kompose.yaml
+            kompose.version: 1.22.0 (955b78124)
+          creationTimestamp: null
+          labels:
+            io.kompose.network/mb: "true"
+            io.kompose.service: container2
+        spec:
+          containers:
+            - image: custom_kubernetes_img_test_container2
+              imagePullPolicy: Never
+              name: container2
+              ports:
+                - containerPort: 8080
+              resources: {}
+          restartPolicy: Always
+    status: {}
+kind: List
+metadata: {}
+

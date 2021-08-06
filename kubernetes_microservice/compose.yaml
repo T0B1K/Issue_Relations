@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  container1:
+    build: ./container1
+    container_name: container1
+    ports: 
+      - "80:80"
+    networks:
+      - mb
+  container2:
+    build: ./container2
+    container_name: container2
+    ports: 
+      - "8080:8080"
+    networks:
+      - mb
+
+networks:
+  mb:
