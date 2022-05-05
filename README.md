@@ -7,12 +7,15 @@ This might not be a problem for small software architectures, but when developin
 Because of this threat, a automatic issue-relation classifier is needed, to automatically predict, which issues are dependent on other issues.
 
 ## Our Solution
-First we identified five kinds of issue relations:
-* _issue A leads to issue B_ (henceforth =>)
-* _issue B leads to issue A_ (henceforth <=)
-* _issue A and B are duplicates_ (henceforth dup.)
-* _issue A and B are related but the direction is unknown_ (henceforth <=>)
-* _issue A and B are unrelated_ 
+We formulate issue relation detection as a pair-wise text classification task in which we predict the following classes for issues A and B:
+* (1) A depends on B
+* (2) A results in B
+* (3) mutual related
+* (4) duplicate
+* (5) unrelated
+
+With concrete issues this looks like this:
+![image tex](./relationshipEx.png)
 
 And for those relations we provide a microservice based solution, which automatically creates a issue relation graph for the given issues.
 
@@ -97,7 +100,7 @@ Google Collab offers most the packages runs the code in the browser.\
 *https://colab.research.google.com/*
 
 ## Model performances
-![image tex](./f1_scores_class.PNG)
+![image tex](./tfidfTabelle.PNG)
 
 ## Directory Structure
 
