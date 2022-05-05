@@ -15,7 +15,7 @@ We formulate issue relation detection as a pair-wise text classification task in
 * (5) unrelated
 
 With concrete issues this looks like this:
-![image tex](./relationshipEx.png)
+![image](./relationshipEx.PNG)
 
 And for those relations we provide a microservice based solution, which automatically creates a issue relation graph for the given issues.
 
