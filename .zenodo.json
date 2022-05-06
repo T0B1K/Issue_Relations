@@ -1,0 +1,21 @@
+{
+    "description": "No description provided.", 
+    "license": "other-open", 
+    "title": "Issue_Relations: Paper Release", 
+    "version": "paper", 
+    "upload_type": "software", 
+    "publication_date": "2022-05-06", 
+    "creators": [
+        {
+            "name": "anonymous"
+        }
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "doi", 
+            "identifier": "10.5281/zenodo.6525689", 
+            "relation": "isVersionOf"
+        }
+    ]
+}
