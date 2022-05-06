@@ -12,6 +12,11 @@
     ], 
     "access_right": "open", 
     "related_identifiers": [
+         {
+            "scheme": "url", 
+            "identifier": "", 
+            "relation": "isSupplementTo"
+        }, 
         {
             "scheme": "doi", 
             "identifier": "10.5281/zenodo.6525689", 
